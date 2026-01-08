@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-
 import com.masner.project2.entity.Asset;
 import com.masner.project2.entity.Reservation;
 import com.masner.project2.entity.Reservation.Status;
@@ -41,21 +40,17 @@ public class ReservationService {
             throw new IllegalArgumentException("user inactive");
          }  
         if (!assetActive.isActive()) {
-            throw new IllegalArgumentException("asset inactive");
+            throw new IllegalArgumentException("Asset is disabled");
          }  
-        
-		if (reservation.getStartDate() == null) {
-			throw new IllegalArgumentException("The date is required");
-		}
-		if (reservation.getEndDate() == null) {
-			throw new IllegalArgumentException("The date is required");
-		}  
 		if (startDate.isAfter(endDate)) {
 			throw new IllegalArgumentException("Error date. end date later that star date");
 		} 
         if (startDate.isBefore(LocalDateTime.now())){
             throw new IllegalArgumentException("The reservation must be for a date later than the date of the reservation.");
         } 
+        if (startDate == null || endDate == null){
+            throw new IllegalArgumentException("the date is required.");
+        }
 
         // 2️⃣ Buscar reservas activas del mismo asset
         List<Reservation> activeReservations =
@@ -78,5 +73,29 @@ public class ReservationService {
         reservation.setStatus(Status.ACTIVE);
         reservation.setCreatedAt(LocalDateTime.now());
     }
-    
+
+    public void finalizeExpiredReservations(){
+        List<Reservation> expiredReservations=
+            reservationRepository.findByStatusAndEndDateBefore(
+                Status.ACTIVE, LocalDateTime.now());
+
+        for(Reservation reservation : expiredReservations){
+            reservation.setStatus(Status.FINISHED);
+
+        }
+
+        reservationRepository.saveAll(expiredReservations);
+    }
+
+    public Reservation cancelReservation(Long reservationId){
+        Reservation reservation = reservationRepository.findById(reservationId)
+            .orElseThrow(()-> new IllegalArgumentException("Reservation not found"));
+        
+
+        //Cambiar el estado de la reserva
+        reservation.setStatus(Status.CANCELLED);
+
+        return reservationRepository.save(reservation);
+    }
 }
+

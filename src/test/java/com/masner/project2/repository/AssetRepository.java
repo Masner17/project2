@@ -17,4 +17,6 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
 
     Optional<Asset> findByName(String name);
 
+    
+
 }

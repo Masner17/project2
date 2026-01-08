@@ -21,6 +21,11 @@ public class AssetService {
         return assetRepository.findAll();
     }
 
+    //Obtener todos los assets disponibles
+    public List<Asset> findAllActive() {
+        return assetRepository.findByActiveTrue();
+    }
+
     //Crear
     public Asset create (Asset asset){
         validate(asset);

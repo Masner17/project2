@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.masner.project2.entity.Asset;
 import com.masner.project2.entity.User;
 import com.masner.project2.repository.UserRepository;
 
@@ -19,6 +20,10 @@ public class UserService {
     //Obtener todos los usuarios
     public List<User> findAll(){
         return userRepository.findAll();
+    }
+        //Obtener todos los user disponibles
+    public List<User> findAllActive() {
+        return userRepository.findByActiveTrue();
     }
 
     //Obtener usuario por id
@@ -35,7 +40,7 @@ public class UserService {
         }
 
         if (user.getRole()==null){
-            user.setRole(User.Role.CUSTOMER); //aca al poner automatico rol customer para los nuevos clientes que se registe me sale un error tambien
+            user.setRole(User.Role.CUSTOMER); 
         }
 
         return userRepository.save(user);
@@ -72,10 +77,10 @@ public class UserService {
     }
 
         //Borrar
-    public void deleteAsset(Long id){
+    public void deleteUser(Long id){
         User userExist = userRepository.findById(id)
             .orElseThrow(()-> new IllegalArgumentException("user does not exist"));
         
-        userRepository.deleteById(userExist.getId());
+        userExist.setActive(false);
         }
 }

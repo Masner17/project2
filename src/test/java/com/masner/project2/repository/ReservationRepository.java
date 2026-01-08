@@ -1,5 +1,6 @@
 package com.masner.project2.repository;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -22,6 +23,13 @@ public interface ReservationRepository extends JpaRepository <Reservation, Long>
     List<Reservation> findbyAssetAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
         Asset asset, Date endDate, Date StartDate
     );
+        /*
+    SELECT *
+        FROM reservations
+        WHERE asset_id = ?
+            AND start_date <= ?
+            AND end_date >= ?
+     */
 
     //Esto te trae todas las reservas ACTIVAS de ese asset.
     List<Reservation> findByAssetAndStatus(
@@ -29,11 +37,10 @@ public interface ReservationRepository extends JpaRepository <Reservation, Long>
         Status status
     );
 
-    /*
-    SELECT *
-        FROM reservations
-        WHERE asset_id = ?
-            AND start_date <= ?
-            AND end_date >= ?
-     */
+    List<Reservation> findByStatusAndEndDateBefore(
+    Status status,
+    LocalDateTime date
+);
+
+
 }

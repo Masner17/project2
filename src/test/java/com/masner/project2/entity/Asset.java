@@ -35,6 +35,7 @@ private Long id;
     @OneToMany(mappedBy = "asset")
     private List<Reservation> reservation;
 
+    //IMPORTANTE esto indica si esta disponible en el sistema. NO!! indica si esta ocupado o libre!!!
     @Column(nullable = false)
     private boolean active = true;
 
