@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.masner.project2.entity.Asset;
 import com.masner.project2.entity.User;
 import com.masner.project2.repository.UserRepository;
 

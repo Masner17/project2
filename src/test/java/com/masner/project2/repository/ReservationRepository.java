@@ -19,8 +19,11 @@ public interface ReservationRepository extends JpaRepository <Reservation, Long>
     //Traer todas las reservas de un asset
     List<Reservation> findByAsset(Asset asset);
 
+    //Todas las reservas activas
+    List<Reservation> findByStatus(Reservation.Status status);
+
     //Resesrvas de un asset que se solapen con un rango de fechas
-    List<Reservation> findbyAssetAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+    List<Reservation> findByAssetAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
         Asset asset, Date endDate, Date StartDate
     );
         /*

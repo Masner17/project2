@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,13 +45,13 @@ public class AssetController {
             }
         }
     
-    @PutMapping("/{id}")
+    @PutMapping("/assets/{id}")
     public ResponseEntity<Asset> updateAsset(@PathVariable Long id, @RequestBody Asset asset){
         Asset assetActualizado = assetService.updateAsset(asset, id);
         return new ResponseEntity<>(assetActualizado, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @PutMapping("/assets/{id}/desactive")
     public ResponseEntity<String> deleteAsset(@PathVariable Long id){
         assetService.deleteAsset(id);
         return ResponseEntity.ok("Asset delete");

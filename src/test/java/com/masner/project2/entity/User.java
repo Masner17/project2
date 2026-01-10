@@ -42,7 +42,7 @@ public class User {
     @JoinColumn(name = "role_id" , nullable = false)
     private Role role; */
 
-    @OneToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "user")
     private List<Reservation> reservations;
 
     public User(){

@@ -19,9 +19,14 @@ public class ReservationService {
         this.reservationRepository = reservationRepository;
     }
 
-        //Obtener todos los usuarios
+        //Obtener todas las reservas
     public List<Reservation> findAll(){
         return reservationRepository.findAll();
+    }
+
+        //Obtener todas las disponibles
+    public List<Reservation> findAllActive() {
+        return reservationRepository.findByStatus(Reservation.Status.ACTIVE);
     }
 
     //Crear reserva
@@ -41,16 +46,17 @@ public class ReservationService {
          }  
         if (!assetActive.isActive()) {
             throw new IllegalArgumentException("Asset is disabled");
-         }  
+         }
+        if (startDate == null || endDate == null){
+            throw new IllegalArgumentException("the date is required.");
+        }  
 		if (startDate.isAfter(endDate)) {
 			throw new IllegalArgumentException("Error date. end date later that star date");
 		} 
         if (startDate.isBefore(LocalDateTime.now())){
             throw new IllegalArgumentException("The reservation must be for a date later than the date of the reservation.");
         } 
-        if (startDate == null || endDate == null){
-            throw new IllegalArgumentException("the date is required.");
-        }
+
 
         // 2️⃣ Buscar reservas activas del mismo asset
         List<Reservation> activeReservations =
