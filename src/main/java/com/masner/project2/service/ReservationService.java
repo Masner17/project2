@@ -8,15 +8,23 @@ import com.masner.project2.entity.Asset;
 import com.masner.project2.entity.Reservation;
 import com.masner.project2.entity.Reservation.Status;
 import com.masner.project2.entity.User;
+import com.masner.project2.repository.AssetRepository;
 import com.masner.project2.repository.ReservationRepository;
+import com.masner.project2.repository.UserRepository;
 
 @Service
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
+    private final UserRepository userRepository;
+    private final AssetRepository assetRepository;
 
-    public ReservationService(ReservationRepository reservationRepository){
+    public ReservationService(ReservationRepository reservationRepository, UserRepository userRepository,
+        AssetRepository assetRepository){
+
         this.reservationRepository = reservationRepository;
+        this.userRepository = userRepository;
+        this.assetRepository = assetRepository;
     }
 
         //Obtener todas las reservas
@@ -31,8 +39,22 @@ public class ReservationService {
 
     //Crear reserva
     public Reservation create (Reservation reservation){
-        validateReservation(reservation);
-        return reservationRepository.save(reservation);
+    User user = userRepository.findById(reservation.getUser().getId())
+        .orElseThrow(() -> new IllegalArgumentException("User does not exist"));
+
+    Asset asset = assetRepository.findById(reservation.getAsset().getId())
+        .orElseThrow(() -> new IllegalArgumentException("Asset does not exist"));
+
+    //reemplazamos
+    reservation.setUser(user);
+    reservation.setAsset(asset);
+
+    validateReservation(reservation);
+
+    //estado inicial
+    reservation.setStatus(Reservation.Status.ACTIVE);
+
+    return reservationRepository.save(reservation);
     }
 
     private void validateReservation( Reservation reservation){
@@ -58,7 +80,7 @@ public class ReservationService {
         } 
 
 
-        // 2️⃣ Buscar reservas activas del mismo asset
+        //Buscar reservas activas del mismo asset
         List<Reservation> activeReservations =
             reservationRepository.findByAssetAndStatus(assetActive, Status.ACTIVE);
 
@@ -103,5 +125,20 @@ public class ReservationService {
 
         return reservationRepository.save(reservation);
     }
+
+    public List<Reservation> findActiveReservationsByAsset(Long assetId) {
+
+    Asset asset = assetRepository.findById(assetId)
+        .orElseThrow(() -> new IllegalArgumentException("Asset does not exist"));
+
+    if (!asset.isActive()) {
+        throw new IllegalArgumentException("Asset is disabled");
+    }
+
+    return reservationRepository.findByAssetAndStatus(
+        asset,
+        Reservation.Status.ACTIVE
+    );
+}
 }
 

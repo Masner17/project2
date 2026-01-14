@@ -37,23 +37,23 @@ public class AssetController {
 
     @PostMapping
     public ResponseEntity<Asset> saveAsset(@RequestBody Asset asset){
-        	try {
-			    Asset newAsset = assetService.create(asset);
-			    return new ResponseEntity<>(newAsset, HttpStatus.CREATED);
-		    }  catch (IllegalArgumentException e){
-                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            try {
+                Asset newAsset = assetService.create(asset);
+                return ResponseEntity.status(HttpStatus.CREATED).body(newAsset);
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().build();
             }
         }
     
-    @PutMapping("/assets/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Asset> updateAsset(@PathVariable Long id, @RequestBody Asset asset){
         Asset assetActualizado = assetService.updateAsset(asset, id);
         return new ResponseEntity<>(assetActualizado, HttpStatus.OK);
     }
 
-    @PutMapping("/assets/{id}/desactive")
+    @PutMapping("/{id}/desactive")
     public ResponseEntity<String> deleteAsset(@PathVariable Long id){
         assetService.deleteAsset(id);
-        return ResponseEntity.ok("Asset delete");
+        return ResponseEntity.ok("Asset desactivate");
     }
 }

@@ -39,9 +39,9 @@ public class ReservationController {
     public ResponseEntity<Reservation> saverReservation(@RequestBody Reservation reservation){
         try{
             Reservation newReservation = reservationService.create(reservation);
-            return new ResponseEntity<>(newReservation, HttpStatus.CREATED);
+            return ResponseEntity.status(HttpStatus.CREATED).body(newReservation);
         }catch (IllegalArgumentException e){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -51,8 +51,17 @@ public class ReservationController {
         return ResponseEntity.ok("Reservation cancelled");
     }
 
+    @GetMapping("/asset/{assetId}/availability")
+    public ResponseEntity<List<Reservation>> getAssetAvailability(
+            @PathVariable Long assetId) {
+
+        return ResponseEntity.ok(
+            reservationService.findActiveReservationsByAsset(assetId)
+        );
+    }
+
         @PutMapping("/finalize-expired")
-    public ResponseEntity<String> expiredReservation (@PathVariable Long id){
+    public ResponseEntity<String> expiredReservation (){
         reservationService.finalizeExpiredReservations();
         return ResponseEntity.ok("expired reservations finalized");
     }

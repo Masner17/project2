@@ -1,4 +1,4 @@
-package com.masner.sheduler;
+package com.masner.project2.sheduler;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

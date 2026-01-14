@@ -68,6 +68,7 @@ public class AssetService {
         Asset assetExist = assetRepository.findById(id)
             .orElseThrow(()-> new IllegalArgumentException("user does not exist"));
         
-        assetRepository.deleteById(assetExist.getId());
+            assetExist.setActive(false);
+            assetRepository.save(assetExist);
         }
 }

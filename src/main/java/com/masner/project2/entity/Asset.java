@@ -2,6 +2,8 @@ package com.masner.project2.entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -33,6 +35,7 @@ private Long id;
     private AssetType type;
 
     @OneToMany(mappedBy = "asset")
+    @JsonIgnore
     private List<Reservation> reservation;
 
     //IMPORTANTE esto indica si esta disponible en el sistema. NO!! indica si esta ocupado o libre!!!

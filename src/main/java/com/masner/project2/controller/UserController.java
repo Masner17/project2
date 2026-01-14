@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,9 +38,9 @@ public class UserController {
     public ResponseEntity<User> saveUser(@RequestBody User user){
         try{
             User newUser = userService.create(user);
-            return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+            return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
         } catch (IllegalArgumentException e){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -51,7 +50,7 @@ public class UserController {
         return ResponseEntity.ok(updateUser);
     }
 
-    @DeleteMapping("{id}")
+    @PutMapping("/desactive/{id}")
     public ResponseEntity<String> desactivateUser(@PathVariable Long id){
         userService.deleteUser(id);
         return ResponseEntity.ok("User desactivated succesfully");

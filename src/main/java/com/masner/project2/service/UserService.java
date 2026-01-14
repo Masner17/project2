@@ -34,14 +34,14 @@ public class UserService {
     public User create(User user){
         validate(user);
         Optional<User> exist = userRepository.findByEmail(user.getEmail());
-        if (!exist.isPresent()) {
+        if (exist.isPresent()) {
             throw new IllegalArgumentException("There is already a user with that email address.");
         }
 
         if (user.getRole()==null){
             user.setRole(User.Role.CUSTOMER); 
         }
-
+        user.setActive(true);
         return userRepository.save(user);
     }
 
@@ -71,6 +71,7 @@ public class UserService {
         userValidate.setEmail(user.getEmail());
         userValidate.setName(user.getName());
         userValidate.setPassword(user.getPassword());
+        userValidate.setActive(user.isActive());
         
             return userRepository.save(userValidate);
     }
@@ -81,5 +82,6 @@ public class UserService {
             .orElseThrow(()-> new IllegalArgumentException("user does not exist"));
         
         userExist.setActive(false);
+        userRepository.save(userExist);
         }
 }
