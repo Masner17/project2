@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.masner.project2.dto.asset.AssetRequestDTO;
+import com.masner.project2.dto.asset.AssetResponseDTO;
 import com.masner.project2.entity.Asset;
+import com.masner.project2.mapper.AssetMapper;
 import com.masner.project2.service.AssetService;
 
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,33 +28,47 @@ public class AssetController {
         this.assetService = assetService;
     }
 
+    //stream lee cada asset .map lo convierte en assetResponseDTO
+    //toList convierte el stream en una lista nuevamente
     @GetMapping
-    public List<Asset> getAllAssets(){
-        return assetService.findAll();
+    public ResponseEntity<List<AssetResponseDTO>> getAllAssets(){
+        List<AssetResponseDTO> assets = assetService.findAll()
+            .stream()
+            .map(AssetMapper::toResponse)
+            .toList();
+        return ResponseEntity.ok(assets);
     }
 
     @GetMapping("/active")
-    public List<Asset> getActiveAssets(){
-        return assetService.findAllActive();
+    public ResponseEntity<List<AssetResponseDTO>> getActiveAssets(){
+        List<AssetResponseDTO> assets = assetService.findAllActive()
+            .stream()
+            .map(AssetMapper::toResponse)
+            .toList();
+
+        return ResponseEntity.ok(assets);
     }
 
     @PostMapping
-    public ResponseEntity<Asset> saveAsset(@RequestBody Asset asset){
+    public ResponseEntity<AssetResponseDTO> saveAsset(@RequestBody AssetRequestDTO request){
             try {
-                Asset newAsset = assetService.create(asset);
-                return ResponseEntity.status(HttpStatus.CREATED).body(newAsset);
+                Asset asset = AssetMapper.toEntity(request);
+                Asset saved = assetService.create(asset);
+                return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(AssetMapper.toResponse(saved));
             } catch (IllegalArgumentException e) {
                 return ResponseEntity.badRequest().build();
             }
         }
     
     @PutMapping("/{id}")
-    public ResponseEntity<Asset> updateAsset(@PathVariable Long id, @RequestBody Asset asset){
-        Asset assetActualizado = assetService.updateAsset(asset, id);
-        return new ResponseEntity<>(assetActualizado, HttpStatus.OK);
+    public ResponseEntity<AssetResponseDTO> updateAsset(@PathVariable Long id, @RequestBody AssetRequestDTO request){
+        Asset asset = AssetMapper.toEntity(request);
+        Asset update = assetService.updateAsset(asset, id);
+        return ResponseEntity.ok(AssetMapper.toResponse(update));
     }
 
-    @PutMapping("/{id}/desactive")
+    @PutMapping("/{id}/desactivate")
     public ResponseEntity<String> deleteAsset(@PathVariable Long id){
         assetService.deleteAsset(id);
         return ResponseEntity.ok("Asset desactivate");

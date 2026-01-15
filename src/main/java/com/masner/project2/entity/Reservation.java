@@ -102,14 +102,6 @@ public class Reservation {
         this.createdAt = createdAt;
     }
 
-    /*public List<Reservation> getReservations() {
-        return reservations;
-    }
-
-    public void setReservations(List<Reservation> reservations) {
-        this.reservations = reservations;
-    } */
-
     public User getUser() {
         return user;
     }

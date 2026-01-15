@@ -38,11 +38,12 @@ public class ReservationService {
     }
 
     //Crear reserva
-    public Reservation create (Reservation reservation){
-    User user = userRepository.findById(reservation.getUser().getId())
+    public Reservation create (Reservation reservation, Long userId, Long assetId){
+
+    User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("User does not exist"));
 
-    Asset asset = assetRepository.findById(reservation.getAsset().getId())
+    Asset asset = assetRepository.findById(assetId)
         .orElseThrow(() -> new IllegalArgumentException("Asset does not exist"));
 
     //reemplazamos
@@ -53,6 +54,7 @@ public class ReservationService {
 
     //estado inicial
     reservation.setStatus(Reservation.Status.ACTIVE);
+    reservation.setCreatedAt(LocalDateTime.now());
 
     return reservationRepository.save(reservation);
     }

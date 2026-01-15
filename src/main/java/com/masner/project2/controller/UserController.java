@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.masner.project2.dto.user.UserRequestDTO;
+import com.masner.project2.dto.user.UserResponseDTO;
 import com.masner.project2.entity.User;
+import com.masner.project2.mapper.UserMapper;
 import com.masner.project2.service.UserService;
 
 @RestController
@@ -25,29 +28,42 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers(){
-        return ResponseEntity.ok(userService.findAll());
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers(){
+        List<UserResponseDTO> users = userService.findAll()
+            .stream()
+            .map(UserMapper::toResponse)
+            .toList();
+
+        return ResponseEntity.ok(users);
     }
 
     @GetMapping("/active")
-    public ResponseEntity<List<User>> getActiveUser(){
-        return ResponseEntity.ok(userService.findAllActive());
+    public ResponseEntity<List<UserResponseDTO>> getActiveUser(){
+        List<UserResponseDTO> users = userService.findAllActive()
+            .stream()
+            .map(UserMapper::toResponse)
+            .toList();
+        return ResponseEntity.ok(users);
     }
 
     @PostMapping
-    public ResponseEntity<User> saveUser(@RequestBody User user){
+    public ResponseEntity<UserResponseDTO> saveUser(@RequestBody UserRequestDTO request){
         try{
-            User newUser = userService.create(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
+            User user = UserMapper.toEntity(request);
+            User saved = userService.create(user);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                .body(UserMapper.toResponse(saved));
         } catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().build();
         }
+
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user){
-        User updateUser = userService.updateUser(user, id);
-        return ResponseEntity.ok(updateUser);
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @RequestBody UserRequestDTO request){
+        User user = UserMapper.toEntity(request);
+        User updated = userService.updateUser(user, id);
+        return ResponseEntity.ok(UserMapper.toResponse(updated));
     }
 
     @PutMapping("/desactive/{id}")
@@ -56,3 +72,5 @@ public class UserController {
         return ResponseEntity.ok("User desactivated succesfully");
     }
 }
+
+//ResponseEntity permite controlar http status, body y headers

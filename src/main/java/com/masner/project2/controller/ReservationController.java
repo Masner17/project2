@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.masner.project2.dto.reservation.ReservationRequestDTO;
+import com.masner.project2.dto.reservation.ReservationResponseDTO;
 import com.masner.project2.entity.Reservation;
+import com.masner.project2.mapper.ReservationMapper;
 import com.masner.project2.service.ReservationService;
 
 
@@ -26,20 +29,32 @@ public class ReservationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Reservation>> getAllReservation(){
-        return ResponseEntity.ok(reservationService.findAll());
+    public ResponseEntity<List<ReservationResponseDTO>> getAllReservation(){
+        List<ReservationResponseDTO> reservation = reservationService.findAll()
+            .stream()
+            .map(ReservationMapper::toResponse)
+            .toList();
+
+        return ResponseEntity.ok(reservation);
     }
 
     @GetMapping("/active")
-    public ResponseEntity<List<Reservation>> getActiveReservation(){
-        return ResponseEntity.ok(reservationService.findAllActive());
+    public ResponseEntity<List<ReservationResponseDTO>> getActiveReservation(){
+        List<ReservationResponseDTO> reservation = reservationService.findAllActive()
+            .stream()
+            .map(ReservationMapper::toResponse)
+            .toList();
+
+        return ResponseEntity.ok(reservation);
     }
 
     @PostMapping
-    public ResponseEntity<Reservation> saverReservation(@RequestBody Reservation reservation){
+    public ResponseEntity<ReservationResponseDTO> saverReservation(@RequestBody ReservationRequestDTO request){
         try{
-            Reservation newReservation = reservationService.create(reservation);
-            return ResponseEntity.status(HttpStatus.CREATED).body(newReservation);
+            Reservation reservation = ReservationMapper.toEntity(request);
+            Reservation saved = reservationService.create(reservation, request.getUserId(), request.getAssetId());
+            return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ReservationMapper.toResponse(saved));
         }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().build();
         }
@@ -52,12 +67,15 @@ public class ReservationController {
     }
 
     @GetMapping("/asset/{assetId}/availability")
-    public ResponseEntity<List<Reservation>> getAssetAvailability(
+    public ResponseEntity<List<ReservationResponseDTO>> getAssetAvailability(
             @PathVariable Long assetId) {
 
-        return ResponseEntity.ok(
-            reservationService.findActiveReservationsByAsset(assetId)
-        );
+        List<ReservationResponseDTO> reservations = 
+                reservationService.findActiveReservationsByAsset(assetId)
+                .stream()
+                .map(ReservationMapper::toResponse)
+                .toList();
+        return ResponseEntity.ok(reservations);
     }
 
         @PutMapping("/finalize-expired")
