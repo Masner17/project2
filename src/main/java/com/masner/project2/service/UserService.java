@@ -3,17 +3,25 @@ package com.masner.project2.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.masner.project2.dto.auth.LoginResponseDTO;
 import com.masner.project2.entity.User;
 import com.masner.project2.repository.UserRepository;
+import com.masner.project2.security.JwtService;
 
 @Service
 public class UserService {
-    private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository){
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService){
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     //Obtener todos los usuarios
@@ -37,6 +45,8 @@ public class UserService {
         if (exist.isPresent()) {
             throw new IllegalArgumentException("There is already a user with that email address.");
         }
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         if (user.getRole()==null){
             user.setRole(User.Role.CUSTOMER); 
@@ -84,4 +94,21 @@ public class UserService {
         userExist.setActive(false);
         userRepository.save(userExist);
         }
+
+    public LoginResponseDTO login (String email, String rawPassword){
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+
+        if (!user.isActive()){
+            throw new IllegalArgumentException("User is inactive");
+        }
+
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())){
+            throw new IllegalArgumentException("Invalid credentials");
+        }
+
+        String token = jwtService.generateToken(user.getEmail());
+
+        return new LoginResponseDTO(token);
+    }
 }

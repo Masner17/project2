@@ -1,4 +1,4 @@
-package com.masner.project2.config;
+package com.masner.project2.security;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
