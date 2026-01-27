@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,7 @@ public class UserController {
         this.userService = userService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAllUsers(){
         List<UserResponseDTO> users = userService.findAll()
@@ -37,6 +39,7 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/active")
     public ResponseEntity<List<UserResponseDTO>> getActiveUser(){
         List<UserResponseDTO> users = userService.findAllActive()
@@ -59,13 +62,15 @@ public class UserController {
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @RequestBody UserRequestDTO request){
         User user = UserMapper.toEntity(request);
         User updated = userService.updateUser(user, id);
         return ResponseEntity.ok(UserMapper.toResponse(updated));
     }
-
+    
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/desactive/{id}")
     public ResponseEntity<String> desactivateUser(@PathVariable Long id){
         userService.deleteUser(id);

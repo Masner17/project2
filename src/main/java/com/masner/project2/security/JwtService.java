@@ -24,9 +24,10 @@ public class JwtService {
     }
 
     //Generar token
-    public String generateToken(String email){
+    public String generateToken(String email, String role){
         return Jwts.builder()
             .setSubject(email)
+            .claim("role", role)
             .setIssuedAt(new Date())
             .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
             .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -36,6 +37,10 @@ public class JwtService {
     //Extraer email
     public String extractEmail(String token) {
         return extractAllClaims(token).getSubject();
+    }
+
+    public String extractRole(String token) {
+    return extractAllClaims(token).get("role", String.class);
     }
 
     //Validar token

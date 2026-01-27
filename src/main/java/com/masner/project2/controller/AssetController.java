@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,6 +50,7 @@ public class AssetController {
         return ResponseEntity.ok(assets);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<AssetResponseDTO> saveAsset(@RequestBody AssetRequestDTO request){
             try {
@@ -61,6 +63,7 @@ public class AssetController {
             }
         }
     
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<AssetResponseDTO> updateAsset(@PathVariable Long id, @RequestBody AssetRequestDTO request){
         Asset asset = AssetMapper.toEntity(request);
@@ -68,6 +71,7 @@ public class AssetController {
         return ResponseEntity.ok(AssetMapper.toResponse(update));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/desactivate")
     public ResponseEntity<String> deleteAsset(@PathVariable Long id){
         assetService.deleteAsset(id);
